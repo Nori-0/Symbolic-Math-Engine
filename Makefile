@@ -2,19 +2,25 @@ TARGET = cas
 
 CC = gcc
 
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -I./include
 
 LIBS = -lm
 
-SRCS = main.c lexer.c ast.c parser.c math_engine.c plotter.c solver.c taylor.c
+SRC_DIR = src
+OBJ_DIR = build
 
-OBJS = $(SRCS:.c=.o)
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
+
+all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
-%.o: %.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR) 
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET)
