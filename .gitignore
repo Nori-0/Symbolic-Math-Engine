@@ -1,0 +1,4 @@
+#Ignora i file oggetto compilati, ignora gli eseguibili Mac/Linux/Windows
+*.o
+cas
+cas.exe
