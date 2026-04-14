@@ -151,7 +151,7 @@ NodoAST* deriva(NodoAST* radice, const char* var) {
 			}
 		}
 
-	printf("[ATTENZIONE] Regola di derivazione non ancora implementata per questo nodo.\n");
+	printf("[WARNING] Differentiation rule not yet implemented for this node.\n");
 	return crea_nodo_numero(0.0);
 }
 
@@ -216,11 +216,11 @@ NodoAST* integra(NodoAST* radice, const char* var) {
 				return crea_nodo_funzione("exp", var_copia);
 			}
 		} else {
-			printf("[SISTEMA] Integrazione analitica di funzioni composte ('%s(f(x))') non supportata dal motore simbolico di base.\n", radice->nome);
+			printf("[SYSTEM] Analytical integration of composite functions ('%s(f(x))') is not supported by the base symbolic engine.\n", radice->nome);
 			return crea_nodo_numero(0.0);
 		}
 	}
-	printf("[ATTENZIONE] Integrazione non ancora supportata per questo pattern.\n");
+	printf("[WARNING] Integration not yet supported for this pattern.\n");
     return crea_nodo_numero(0.0);
 }
 
@@ -341,7 +341,7 @@ double valuta_albero(NodoAST* radice, TabellaSimboli* tabella) {
 			    return tabella->array[i].valore;
 		    }
 	    }
-	    printf("[ERRORE] Variabile sconosciuta: %s\n", radice->nome);
+	    printf("[ERROR] Variable undefined: %s\n", radice->nome);
 	    return 0.0;
     }
 
@@ -355,7 +355,7 @@ double valuta_albero(NodoAST* radice, TabellaSimboli* tabella) {
             case '*': return sx * dx;
             case '/': 
                 if (dx == 0) {
-                    printf("[ATTENZIONE] Divisione per zero!\n");
+                    printf("[WARNING] Division by zero!\n");
                     return 0.0; 
                 }
                 return sx / dx;
@@ -372,14 +372,14 @@ double valuta_albero(NodoAST* radice, TabellaSimboli* tabella) {
 	if (strcmp(radice->nome, "exp") == 0) return exp(argomento);
         if (strcmp(radice->nome, "log") == 0){
 		if (argomento <= 0.0) {
-			printf("[ATTENZIONE] Dominio invalido: logaritmo di un numero <= 0 (valore: %g)!\n", argomento);
+			printf("[WARNING] Invalid domain: logarithm of a number <= 0 (value: %g)!\n", argomento);
 			return 0.0;
 		}
 		return log(argomento);
 	}
 	if(strcmp(radice->nome, "sqrt") == 0){
 		if (argomento < 0) {
-			printf("[ATTENZIONE] Dominio invalido: radice di numero negativo!\n");
+			printf("[WARNING] Invalid domain: square root of a negative number!\n");
 			return 0.0;
 		}
 		return sqrt(argomento);

@@ -41,59 +41,96 @@ make
 ```
 ### Usage Example
 ```Plaintext
---- Calcolatore CAS in C ---
-Inserisci la funzione f (max 255 caratteri): sin(x)
+--- C Symbolic CAS Engine ---
+Enter function f(x) : sin(x)
 
-[DEBUG] Albero Sintattico Astratto (AST) di partenza:
+[DEBUG] Starting Abstract Syntax Tree (AST):
 
 [sin]
  └─[x]
 
 
-Variabili trovate nell'espressione: [x]
-Rispetto a quale variabile vuoi operare? x
+Variables found in the expression: [x]
+Target variable for calculus: x
 
 =====================================
- FUNZIONE: f = sin(x)
- DERIVATA: df/dx = cos(x)
- INTEGRALE: INT(f dx) = -1 * cos(x) + C
+ FUNCTION: f = sin(x)
+ DERIVATIVE: df/dx = cos(x)
+ INTEGRAL: INT(f dx) = -1 * cos(x) + C
 =====================================
 
---- CALCOLO NUMERICO ---
-Quanto vale 'x'? 5
+--- NUMERICAL CALCULATION ---
+What is the value of 'x'? 15
 
-[RISULTATI]
-Valore della funzione: f = -0.958924
-Derivata parziale in quel punto: f' = 0.283662
+[RESULTS]
+Function value: f = 0.650288
+Partial derivative at that point: f' = -0.759688
 
---- CALCOLO AREA (INTEGRALE DEFINITO) ---
-Vuoi calcolare l'area tra due estremi per la variabile 'x'? (s/n): n
+--- AREA CALCULATION (DEFINITE INTEGRAL) ---
+Do you want to calculate the area between two limits for variable 'x'? (y/n): y
+Enter the lower limit (a): 1
+Enter the upper limit (b): 2
 
-Vuoi visualizzare il grafico della funzione? (s/n): n
+[DEFINITE INTEGRAL RESULT]
+Area under the curve between 1 and 2: 0.956449
 
-Vuoi trovare in quale punto la funzione si azzera (f(x) = 0)? (s/n): s
+Do you want to find the function graph ? (y/n): y
 
---- CACCIATORE DI ZERI (Newton-Raphson) ---
-Inserisci un punto di partenza (ipotesi iniziale) per x (es. 1.0): 0.5
+--- ASCII PLOTTER ---
+Enter lower bound for x (e.g. -10): -10
+Enter upper bound for x (e.g. 10): 10
 
-Ricerca dello zero in corso...
-Iterazione  1: x =  -0.046302 | f(x) =   0.479426
-Iterazione  2: x =   0.000033 | f(x) =  -0.046286
-Iterazione  3: x =  -0.000000 | f(x) =   0.000033
-Iterazione  4: x =   0.000000 | f(x) =  -0.000000
+f(x) Graph in [-10.00, 10.00]. Range Y: [-1.00, 1.00]
 
-[SUCCESSO] Zero trovato in un lampo!
-La curva taglia l'asse X esattamente nel punto: x = 0
+                  **               |   **                    **
+                 *  *              |   * *                  *  *
+                *   *              |  *   *                 *   *
+                *    *             |  *    *               *    *
+               *     *             | *     *               *     *
+*              *      *            | *     *              *      *
+*              *      *            |*       *             *      *
+ *            *       *            |*       *             *       *
+ *            *        *           |*       *            *        *
+ *            *        *           *         *           *        *
+ *           *         *           *         *           *        *
+  *          *         *           *         *           *         *
+--*----------*----------*----------*---------*----------*----------*--
+  *          *          *         *|          *         *          *
+   *        *           *         *|          *         *           *
+   *        *            *        *|          *        *            *
+   *        *            *       * |           *       *            *
+    *      *             *       * |           *       *             *
+    *      *             *       * |           *      *              *
+    *      *              *     *  |            *     *              *
+     *    *               *     *  |            *     *
+     *    *                *    *  |             *   *
+      *   *                *   *   |             *   *
+      *  *                  *  *   |              * *
+       **                    **    |              **
 
-Vuoi approssimare la funzione con una Serie di Taylor (Maclaurin)? (s/n): s
-Inserisci il grado del polinomio (es. 5): 5
+Do you want to find where the function equals zero (f(x) = 0)? (y/n): y
 
-[POLINOMIO DI TAYLOR GRADO 5]
+--- ROOT FINDER (Newton-Raphson) ---
+Enter a starting point (initial guess) for x (e.g., 1.0): 1
+
+Searching for root...
+Iteraction number  1: x =  -0.557408 | f(x) =   0.841471
+Iteraction number  2: x =   0.065936 | f(x) =  -0.528988
+Iteraction number  3: x =  -0.000096 | f(x) =   0.065889
+Iteraction number  4: x =   0.000000 | f(x) =  -0.000096
+Iteraction number  5: x =   0.000000 | f(x) =   0.000000
+
+[SUCCESS] Root found in a flash!
+The curve intersects the X-axis exactly at point: x = 0
+
+Do you want to approximate the function with a Taylor (Maclaurin) Series? (y/n): y
+Enter the degree of the polynomial (e.g. 5): 5
+
+[TAYLOR POLYNOMIAL OF DEGREE 5]
 T(x) = (x + -0.17 * x^3) + 0.01 * x^5
 
-[SISTEMA] Pulizia della memoria in corso...
-[SISTEMA] Memoria liberata con successo. Nessun leak rilevato.
-
+[SYSTEM] Memory cleanup in progress...
+[SYSTEM] Memory successfully freed. No leaks detected.
 ```
 
 ## Future Roadmap

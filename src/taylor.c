@@ -23,7 +23,7 @@ NodoAST* serie_di_taylor(NodoAST* radice, const char* var_nome, int grado, Tabel
 	}
 
 	if (indice_var == -1) {
-		printf("[ERRORE] Variabile non trovata per lo sviluppo di Taylor.\n");
+		printf("[ERROR] Variable not found for Taylor expansion.\n");
 		return crea_nodo_numero(0.0);
 	}
 

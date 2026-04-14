@@ -26,15 +26,15 @@ void disegna_grafico_ascii(NodoAST* radice, TabellaSimboli* tabella, const char*
     char input[64];
     double x_min = -10.0, x_max = 10.0;
 
-    printf("\n--- PLOTTER ASCII ---\n");
-    printf("Inserisci limite inferiore per %s (es. -10): ", var_nome);
+    printf("\n--- ASCII PLOTTER ---\n");
+    printf("Enter lower bound for %s (e.g. -10): ", var_nome);
     if (fgets(input, sizeof(input), stdin) != NULL) x_min = strtod(input, NULL);
     
-    printf("Inserisci limite superiore per %s (es. 10): ", var_nome);
+    printf("Enter upper bound for %s (e.g. 10): ", var_nome);
     if (fgets(input, sizeof(input), stdin) != NULL) x_max = strtod(input, NULL);
 
     if (x_min >= x_max) {
-        printf("[ERRORE] Il limite inferiore deve essere minore di quello superiore.\n");
+        printf("[ERROR] The lower bound has to be lower than the upper bound.\n");
         return;
     }
 
@@ -67,7 +67,7 @@ void disegna_grafico_ascii(NodoAST* radice, TabellaSimboli* tabella, const char*
 
     if (y_max == y_min) { y_max += 1.0; y_min -= 1.0; }
     if (isinf(y_min) || isinf(y_max)) {
-        printf("[ERRORE] Impossibile determinare i limiti del grafico.\n");
+        printf("[ERROR] Impossible to determine the bounds of the graph.\n");
         return;
     }
 
@@ -116,7 +116,7 @@ int prev_col = -1;
         }
     }
 
-    printf("\nGrafico di f(%s) in [%.2f, %.2f]. Range Y: [%.2f, %.2f]\n\n", var_nome, x_min, x_max, y_min, y_max);
+    printf("\nf(%s) Graph in [%.2f, %.2f]. Range Y: [%.2f, %.2f]\n\n", var_nome, x_min, x_max, y_min, y_max);
     for (int r = 0; r < PLOT_HEIGHT; r++) {
         for (int c = 0; c < PLOT_WIDTH; c++) {
             putchar(griglia[r][c]);

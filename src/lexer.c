@@ -18,7 +18,7 @@ int estrai_numero(const char* input, int indice, Token* token) {
 		if ( c == '.' || c == ',') {
 			punti++;
 			if (punti > 1) {
-				printf("\n[ERRORE SINTATTICO] Formato numero non valido: troppi separatori decimali vicno a '%s'\n", &input[indice - 2]);
+				printf("\n[SYNTAX ERROR] Invalid number format: too many decimal separators near %s\n", &input[indice - 2]);
 					break;
 				}
 			buffer[j] = '.';
@@ -28,7 +28,7 @@ int estrai_numero(const char* input, int indice, Token* token) {
 		j++;
 		indice++;
 		if (j >= 63) {
-			printf("\n[ERRORE LIMITE] Numero troppo lungo inserito.\n");
+			printf("\n[LIMIT ERROR] Number entered is too long.\n");
 			break;
 		}
 	}
@@ -63,7 +63,7 @@ int estrai_testo(const char* input, int indice, Token* token) {
 		strcpy(token->nome, buffer);
 	} 
 	else {
-		printf("[ATTENZIONE] Testo sconosciuto: %s\n", buffer);
+		printf("[WARNING] Unknown text: %s\n", buffer);
 	}
 	
 	return indice;
@@ -107,7 +107,7 @@ void tokenizza(const char* input) {
             	case '(': t->tipo = TOKEN_PAREN_APERTA; break;
             	case ')': t->tipo = TOKEN_PAREN_CHIUSA; break;
             	default:
-                	printf("[ERRORE] Carattere non riconosciuto: %c\n", input[i]);
+                	printf("[ERROR] Unrecognized character %c\n", input[i]);
                 	i++;
                 	continue;
         	}
