@@ -1,6 +1,6 @@
 # CAS-C: A Symbolic Computer Algebra System in Pure C
 
-![High-Res Plot Example](assets/graph.png)
+![High-Res Plot Example](assets/graph.jpg)
 
 CAS-C is a lightweight, fully modular Computer Algebra System built entirely from scratch in pure C. It features a custom Lexer, an Abstract Syntax Tree (AST) Parser based on the Shutting-Yard algorithm, and a powerful Symbolic Math Enginge capable of exact differentiation, simplification, ad integration.
 
