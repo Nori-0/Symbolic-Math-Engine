@@ -148,7 +148,7 @@ int main() {
 
 	printf("\nDo you want to find the function graph ? (y/n): ");
 	if (fgets(risposta, sizeof(risposta), stdin) != NULL && (risposta[0] == 'y' || risposta[0] == 'Y')) {
-		disegna_grafico_ascii(radice, &tabella, var_bersaglio);
+		draw_ascii_graph(radice, &tabella, var_bersaglio);
 	}
 
 	printf("\nDo you want to find where the function equals zero (f(x) = 0)? (y/n): ");

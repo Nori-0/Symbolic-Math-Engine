@@ -2,7 +2,7 @@ TARGET = cas
 
 CC = gcc
 
-CFLAGS = -Wall -g -I./include
+CFLAGS = -Wall -O3 -I./include
 
 LIBS = -lm
 
