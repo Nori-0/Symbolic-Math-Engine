@@ -6,10 +6,17 @@ CAS-C is a lightweight, fully modular Computer Algebra System built entirely fro
 
 No external libraries were used (except the standard C `<math.h>`and `<stdio.h>`. This project started as a personal challenge, to test my programming skills, and it gradually evolved into a more advanced idea than I initially thought.
 
+## What's New in Version 2.0: The Complex Domain
+The engine has been entirely rewritten to natively support the Complex Plane (Argand-Gauss).
+* **Custom Complex Arithmetic:** The core abstract syntax tree now evaluates a custom `Complex` struct rather than standard double-precision floats;
+* **Expanded Domain:** Functions like $\sqrt{-4}$ or $\log(-1)$ no longer throw errors, evaluated seamlessly via Euler's formulas;
+* **Imaginary Root Finding:** The Newton-Raphson solver dynamically breaks out of the real line to find complex roots for unsolvable real equations (e.g., $x^2 + 4 = 0 \rightarrow x = \pm 2i$);
+* **Retrocompatibility:** Real numbers are formatted cleanly, keeping the complex nature of the engine completely transparent to the user unless imaginary components are present.
+
 ## Features
 * **Symbolic Differentiation:** Computes exact derivatives (including product, quotient, and chain rules) for multi-variable expressions;
 * **Symbolic Integration:** Solves indefinite integrals for polynomials and basic transcendental functions;
-* **Algebraic Optimizer:** Canonizes equations (AST sorting) and prunes redundant branches (e.g., `x/x = 1`, `A - A = 0`);
+* **Algebraic Optimizer:** Canonizes equations (AST sorting) and prunes redundant branches (e.g., `x/x = 1`, `A - A = 0`, `i * i = -1`);
 * **Newton-Raphson Root Finder:** Uses the exact symbolic derivative to find roots of complex non-linear equations with high precision;
 * **Taylor Series Generator:** Expands any function into a Maclaurin polynomial of a user-defined degree;
 * **High-Res Raster Plotter:** Upgraded from a standard ASCII plotter to a custom pixel-buffer graphics engine. It evaluates functions and maps them to a discrete grid using Bresenham's Line Algorithm, generating `.ppm` image files rendered natively in modern terminals.
@@ -19,6 +26,7 @@ The project follows a strict separation of concerns, divided into specialized mo
 * `lexer.c/h`: Tokenizes the mathematical string input;
 * `parser.c/h`: Builds the AST using Dijkstra's Shunting-Yard algorithm;
 * `ast.c/h`: Defines tree structures and unparsing (equation printing) logic;
+* `complex_math.c/h`: The foundational mathematics library handling complex arithmetic and transcendental complex functions;
 * `math_engine.c/h`: The core symbolic AI (Derivatives, Integrals, Optimizations);
 * `plotter.c/h`: Evaluates and maps the continuous function to a discrete terminal grid;
 * `solver.c/h`: Numerical analysis using Newton's method;
@@ -44,7 +52,8 @@ make
 
 ## Future Roadmap
 While the core engine is fully functional, the modular architecture was designed with scalability in mind. Planned future implementations include:
-* **Complex Numbers Support:** Extending the AST and math engine to handle imaginary units (`i`) and complex arithmetic natively.
+
+* **Linear Algebra:** Introducing matrices, vectors, and symbolic matrix operations (e.g., determinants, dot products).
 * **Symbolic Equation Solving:** Implementing algebraic isolation algorithms alongside the current numerical Newton-Raphson solver.
 * **Interactive Rendering:** Upgrading the current static terminal rasterizer to a fully interactive window with real-time zooming and panning using C libraries like Raylib.
-* **Linear Algebra:** Introducing matrices, vectors, and symbolic matrix operations (e.g., determinants, dot products).
+

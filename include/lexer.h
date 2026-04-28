@@ -4,6 +4,8 @@
 #define MAX_INPUT_SIZE 256
 #define MAX_TOKENS 100
 
+#include "complex_math.h"
+
 typedef enum {
     TOKEN_NUMERO,
     TOKEN_VARIABILE,
@@ -21,7 +23,7 @@ typedef enum {
 
 typedef struct {
     TipoToken tipo;
-    double valore;
+    Complex valore;
     char nome[10];
 } Token;
 

@@ -4,7 +4,7 @@
 #include <math.h>
 #include "ast.h"
 
-NodoAST* crea_nodo_numero(double valore) {
+NodoAST* crea_nodo_numero(Complex valore) {
 	NodoAST* nodo = (NodoAST*)malloc(sizeof(NodoAST));
 	nodo->tipo = NODO_NUMERO;
 	nodo->valore_numero = valore;
@@ -80,7 +80,11 @@ void stampa_albero_ricorsiva(NodoAST* radice, int livello, int is_left, int* ram
         }
     }
 
-	if (radice->tipo == NODO_NUMERO) printf("[%.2f]\n", radice->valore_numero);
+	if (radice->tipo == NODO_NUMERO) {
+		printf("[");
+		complex_printf(radice->valore_numero);
+		printf("]\n");
+	}
     else if (radice->tipo == NODO_OPERATORE) printf("[%c]\n", radice->operatore);
     else if (radice->tipo == NODO_VARIABILE) printf("[%s]\n", radice->nome);
     else if (radice->tipo == NODO_FUNZIONE) printf("[%s]\n", radice->nome);
@@ -108,11 +112,7 @@ void stampa_equazione_ricorsiva(NodoAST* radice, int prec_padre) {
     if (radice == NULL) return;
 
     if (radice->tipo == NODO_NUMERO) {
-        if (radice->valore_numero == (int)radice->valore_numero) {
-            printf("%d", (int)radice->valore_numero);
-        } else {
-            printf("%.2f", radice->valore_numero);
-        }
+        complex_printf(radice->valore_numero);
     } 
     else if (radice->tipo == NODO_VARIABILE) {
         printf("%s", radice->nome);

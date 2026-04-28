@@ -10,6 +10,7 @@
 #include "plotter.h"
 #include "solver.h"
 #include "taylor.h"
+#include "complex_math.h"
 
 int main() {
     char input[MAX_INPUT_SIZE];
@@ -31,11 +32,11 @@ int main() {
         TabellaSimboli tabella = { .conteggio = 0};
 
         strcpy(tabella.array[tabella.conteggio].nome, "pi");
-        tabella.array[tabella.conteggio].valore = M_PI;
+        tabella.array[tabella.conteggio].valore = complex_create(M_PI, 0.0);
         tabella.conteggio++;
 
         strcpy(tabella.array[tabella.conteggio].nome, "e");
-        tabella.array[tabella.conteggio].valore = M_E;
+        tabella.array[tabella.conteggio].valore = complex_create(M_E, 0.0);
         tabella.conteggio++;
 
         trova_variabili(radice, &tabella);
@@ -75,6 +76,9 @@ int main() {
 		}
 	} else {
 		printf("\n[SYSTEM] No unknown variables found. Using 'x' as the default.\n");
+		strcpy(tabella.array[tabella.conteggio].nome, "x");
+		tabella.array[tabella.conteggio].valore = complex_create(0.0, 0.0);
+		tabella.conteggio++;
 	}
 
         NodoAST* radice_d = deriva(radice, var_bersaglio);
@@ -104,16 +108,21 @@ int main() {
 
             printf("What is the value of '%s'? ", tabella.array[i].nome);
             if (fgets(buffer_valore, sizeof(buffer_valore), stdin) != NULL) {
-                tabella.array[i].valore = strtod(buffer_valore, NULL);
+                tabella.array[i].valore = complex_create(strtod(buffer_valore, NULL), 0.0);
             }
         }
         
-        double risultato = valuta_albero(radice, &tabella);
-        double risultato_d = valuta_albero(radice_d, &tabella);
+        Complex risultato = valuta_albero(radice, &tabella);
+        Complex risultato_d = valuta_albero(radice_d, &tabella);
 
         printf("\n[RESULTS]\n");
-        printf("Function value: f = %g\n", risultato);
-        printf("Partial derivative at that point: f' = %g\n", risultato_d);
+        printf("Function value: f = ");
+	complex_printf(risultato);
+	printf("\n");
+        printf("Partial derivative at that point: f' = ");
+	complex_printf(risultato_d);
+	printf("\n");
+
 	printf("\n--- AREA CALCULATION (DEFINITE INTEGRAL) ---\n");
         char risposta[10];
         printf("Do you want to calculate the area between two limits for variable '%s'? (y/n): ", var_bersaglio);
@@ -132,14 +141,19 @@ int main() {
 			}
 		}
 		if (indice_var != -1) {
-			double valore_originale = tabella.array[indice_var].valore;
-			tabella.array[indice_var].valore = b;
-			double f_di_b = valuta_albero(radice_int, &tabella);
-			tabella.array[indice_var].valore = a;
-			double f_di_a = valuta_albero(radice_int, &tabella);
-			double area = f_di_b - f_di_a;
+			Complex valore_originale = tabella.array[indice_var].valore;
+			tabella.array[indice_var].valore = complex_create(b, 0.0);
+			Complex f_di_b = valuta_albero(radice_int, &tabella);
+
+			tabella.array[indice_var].valore = complex_create(a, 0.0);
+			Complex f_di_a = valuta_albero(radice_int, &tabella);
+
+			Complex area = complex_sub(f_di_b, f_di_a);
 			printf("\n[DEFINITE INTEGRAL RESULT]\n");
-			printf("Area under the curve between %g and %g: %g\n", a, b, area);
+			printf("Area under the curve between %g and %g: ", a, b);
+			complex_printf(area);
+			printf("\n");
+
 			tabella.array[indice_var].valore = valore_originale;
 		} else {
 			printf("[ERROR] Integration variable not found in the table.\n");

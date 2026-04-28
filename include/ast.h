@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#include "complex_math.h"
+
 typedef enum {
 	NODO_NUMERO,
 	NODO_VARIABILE,
@@ -11,7 +13,7 @@ typedef enum {
 typedef struct NodoAST {
     TipoNodo tipo;
     union {
-        double valore_numero;
+	Complex valore_numero;
         char operatore;
         char nome[10]; 
     };
@@ -19,7 +21,7 @@ typedef struct NodoAST {
     struct NodoAST* destro;
 } NodoAST;
 
-NodoAST* crea_nodo_numero(double valore);
+NodoAST* crea_nodo_numero(Complex valore);
 NodoAST* crea_nodo_operatore(char op, NodoAST* sx, NodoAST* dx);
 NodoAST* crea_nodo_variabile(const char* nome);
 NodoAST* crea_nodo_funzione(const char* nome, NodoAST* argomento);

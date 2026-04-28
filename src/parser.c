@@ -40,7 +40,7 @@ void risolvi_operatore() {
         if (op.tipo == TOKEN_FUNZIONE) {
             push_nodo(crea_nodo_funzione(op.nome, argomento));
         } else {
-            NodoAST* meno_uno = crea_nodo_numero(-1.0);
+            NodoAST* meno_uno = crea_nodo_numero(complex_create(-1.0, 0.0));
             push_nodo(crea_nodo_operatore('*', meno_uno, argomento));
         }
     } 

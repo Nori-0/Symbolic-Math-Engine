@@ -12,7 +12,7 @@ double fattoriale(int n) {
 }
 
 NodoAST* serie_di_taylor(NodoAST* radice, const char* var_nome, int grado, TabellaSimboli* tabella) {
-	if (radice == NULL || grado < 0) return crea_nodo_numero(0.0);
+	if (radice == NULL || grado < 0) return crea_nodo_numero(complex_create(0.0, 0.0));
 
 	int indice_var = -1;
 	for (int i = 0; i < tabella->conteggio; i++) {
@@ -24,39 +24,48 @@ NodoAST* serie_di_taylor(NodoAST* radice, const char* var_nome, int grado, Tabel
 
 	if (indice_var == -1) {
 		printf("[ERROR] Variable not found for Taylor expansion.\n");
-		return crea_nodo_numero(0.0);
+		return crea_nodo_numero(complex_create(0.0, 0.0));
 	}
 
-	double val_originale = tabella->array[indice_var].valore;
-	tabella->array[indice_var].valore = 0.0;
+	Complex val_originale = tabella->array[indice_var].valore;
+	tabella->array[indice_var].valore = complex_create(0.0, 0.0);
 
 	NodoAST* polinomio_finale = NULL;
 	NodoAST* derivata_corrente = copia_albero(radice);
 
 	for (int i = 0; i <= grado; i++) {
-        double c_val = valuta_albero(derivata_corrente, tabella);
-        if (fabs(c_val) > 1e-9) {
-            double coeff = c_val / fattoriale(i);
-            NodoAST* termine = NULL;
-            if (i == 0) {
-                termine = crea_nodo_numero(coeff);
-            } else if (i == 1) {
-                if (coeff == 1.0) termine = crea_nodo_variabile(var_nome);
-                else if (coeff == -1.0) termine = crea_nodo_operatore('*', crea_nodo_numero(-1.0), crea_nodo_variabile(var_nome));
-                else termine = crea_nodo_operatore('*', crea_nodo_numero(coeff), crea_nodo_variabile(var_nome));
-            } else {
-                NodoAST* potenza = crea_nodo_operatore('^', crea_nodo_variabile(var_nome), crea_nodo_numero((double)i));
-                if (coeff == 1.0) termine = potenza;
-                else if (coeff == -1.0) termine = crea_nodo_operatore('*', crea_nodo_numero(-1.0), potenza);
-                else termine = crea_nodo_operatore('*', crea_nodo_numero(coeff), potenza);
-            }
+        Complex c_val = valuta_albero(derivata_corrente, tabella);
+        if (complex_modulo(c_val) > 1e-9) {
+		Complex fatt = complex_create(fattoriale(i), 0.0);
+            	Complex coeff = complex_div(c_val, fatt);
 
-            if (polinomio_finale == NULL) {
-                polinomio_finale = termine;
-            } else {
-                polinomio_finale = crea_nodo_operatore('+', polinomio_finale, termine);
-            }
-        }
+            	NodoAST* termine = NULL;
+
+            	if (i == 0) {
+                	termine = crea_nodo_numero(coeff);
+            	} else {
+			NodoAST* potenza;
+			if (i == 1) {
+				potenza = crea_nodo_variabile(var_nome);
+			} else {
+				potenza = crea_nodo_operatore('^', crea_nodo_variabile(var_nome), crea_nodo_numero(complex_create((double)i, 0.0)));
+			}
+
+			if (coeff.re == 1.0 && coeff.im == 0.0) {
+				termine = potenza;
+			} else if (coeff.re == -1.0 && coeff.im == 0.0) {
+				termine = crea_nodo_operatore('*', crea_nodo_numero(complex_create(-1.0, 0.0)), potenza);
+			} else {
+				termine = crea_nodo_operatore('*', crea_nodo_numero(coeff), potenza);
+			}
+		}
+
+            	if (polinomio_finale == NULL) {
+                	polinomio_finale = termine;
+            	} else {
+                	polinomio_finale = crea_nodo_operatore('+', polinomio_finale, termine);
+            	}
+        	}
 
         if (i < grado) {
             NodoAST* prossima_derivata = deriva(derivata_corrente, var_nome);
@@ -71,7 +80,7 @@ NodoAST* serie_di_taylor(NodoAST* radice, const char* var_nome, int grado, Tabel
     libera_albero(derivata_corrente);
     tabella->array[indice_var].valore = val_originale;
 
-    if (polinomio_finale == NULL) return crea_nodo_numero(0.0);
+    if (polinomio_finale == NULL) return crea_nodo_numero(complex_create(0.0, 0.0));
     
     return polinomio_finale;
 }

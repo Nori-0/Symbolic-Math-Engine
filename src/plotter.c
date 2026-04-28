@@ -67,7 +67,7 @@ void draw_ascii_graph(NodoAST* root, TabellaSimboli* table, const char* var_name
 	if (var_index == -1)
 		return;
 
-	double original_value = table->array[var_index].valore;
+	Complex original_value = table->array[var_index].valore;
 
 	Pixel* buffer = (Pixel*)malloc(IMG_WIDTH * IMG_HEIGHT * sizeof(Pixel));
 	if (!buffer) {
@@ -87,8 +87,9 @@ void draw_ascii_graph(NodoAST* root, TabellaSimboli* table, const char* var_name
 
 	for (int col = 0; col < IMG_WIDTH; col++) {
 		double x = x_min + col * step_x;
-		table->array[var_index].valore = x;
-		double y = valuta_albero(root, table);
+		table->array[var_index].valore = complex_create(x, 0.0);
+		Complex y_complesso = valuta_albero(root, table);
+		double y = y_complesso.re;
 		y_values[col] = y;
 
 		if (!isnan(y) && !isinf(y)) {

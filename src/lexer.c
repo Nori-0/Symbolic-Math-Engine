@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "lexer.h"
+#include "complex_math.h"
 
 Token lista_token[MAX_TOKENS];
 int numero_token_estratti = 0;
@@ -35,7 +36,7 @@ int estrai_numero(const char* input, int indice, Token* token) {
 
 	buffer[j] = '\0';
 	token->tipo = TOKEN_NUMERO;
-	token->valore = strtod(buffer, NULL);
+	token->valore = complex_create(strtod(buffer, NULL), 0.0);
 
 	return indice;
 }
@@ -54,8 +55,13 @@ int estrai_testo(const char* input, int indice, Token* token) {
 	buffer[j] = '\0';
 
 	if (strlen(buffer) == 1) {
-		token->tipo = TOKEN_VARIABILE;
-		strcpy(token->nome, buffer);
+		if (buffer[0] == 'i') {
+			token->tipo = TOKEN_NUMERO;
+			token->valore = complex_create(0.0, 1.0);
+		} else {
+			token->tipo = TOKEN_VARIABILE;
+			strcpy(token->nome, buffer);
+		}
 	}
 
 	else if (strcmp(buffer, "sin") == 0 || strcmp(buffer, "cos") == 0 || strcmp(buffer, "tan") == 0 || strcmp(buffer, "log") == 0 || strcmp(buffer, "sqrt") == 0 || strcmp(buffer, "exp") == 0) {
@@ -71,6 +77,7 @@ int estrai_testo(const char* input, int indice, Token* token) {
 
 void tokenizza(const char* input) {
 	int i = 0;
+	numero_token_estratti = 0;
 
 	while(input[i] != '\0') {
 		if (isspace(input[i])) {
@@ -122,7 +129,10 @@ void stampa_token() {
     for (int i = 0; i < numero_token_estratti; i++) {
         Token t = lista_token[i];
         switch (t.tipo) {
-            case TOKEN_NUMERO:       printf("NUMERO: %f\n", t.valore); break;
+            case TOKEN_NUMERO:       printf("NUMERO:  ");
+				     complex_printf(t.valore);
+				     printf("\n");
+				     break;
             case TOKEN_VARIABILE:    printf("VARIABILE: %s\n", t.nome); break;
             case TOKEN_FUNZIONE:     printf("FUNZIONE: %s\n", t.nome); break;
             case TOKEN_PIU:          printf("OPERATORE: +\n"); break;
