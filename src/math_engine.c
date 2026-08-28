@@ -225,94 +225,174 @@ NodoAST* integra(NodoAST* radice, const char* var) {
 }
 
 NodoAST* semplifica(NodoAST* radice) {
-	if (radice == NULL) return NULL;
+    if (radice == NULL) return NULL;
 
-	radice->sinistro = semplifica(radice->sinistro);
-	radice->destro = semplifica(radice->destro);
+    radice->sinistro = semplifica(radice->sinistro);
+    radice->destro = semplifica(radice->destro);
 
-	if (radice->tipo == NODO_OPERATORE) {
-		if (radice->sinistro && radice->destro && radice->sinistro->tipo == NODO_NUMERO && radice->destro->tipo == NODO_NUMERO) {
-			Complex sx = radice->sinistro->valore_numero;
-			Complex dx = radice->destro->valore_numero;
-			Complex risultato = complex_create(0.0, 0.0);
-			int calcolo_valido = 1;
+    if (radice->tipo == NODO_OPERATORE) {
+        
+        if (radice->sinistro && radice->destro) {
+            
+            if (radice->sinistro->tipo == NODO_NUMERO && radice->destro->tipo == NODO_NUMERO) {
+                Complex sx = radice->sinistro->valore_numero;
+                Complex dx = radice->destro->valore_numero;
+                Complex risultato = complex_create(0.0, 0.0);
+                int calcolo_valido = 1;
 
-			switch (radice->operatore) {
-				case '+': risultato = complex_add(sx, dx); break;
-				case '-': risultato = complex_sub(sx, dx); break;
-				case '*': risultato = complex_mul(sx, dx); break;
-				case '/': 
-					  if (!complex_is_zero(dx)) risultato = complex_div(sx, dx); 
-					  else calcolo_valido = 0; 
-					  break;
-				case '^': risultato = complex_pow(sx, dx); break;
-				default: calcolo_valido = 0; break;
-			}
+                switch (radice->operatore) {
+                    case '+': risultato = complex_add(sx, dx); break;
+                    case '-': risultato = complex_sub(sx, dx); break;
+                    case '*': risultato = complex_mul(sx, dx); break;
+                    case '/': 
+                          if (!complex_is_zero(dx)) risultato = complex_div(sx, dx); 
+                          else calcolo_valido = 0; 
+                          break;
+                    case '^': risultato = complex_pow(sx, dx); break;
+                    default: calcolo_valido = 0; break;
+                }
 
-			if (calcolo_valido) {
-				radice->tipo = NODO_NUMERO;
-				radice->valore_numero = risultato;
-				libera_albero(radice->sinistro);
-				libera_albero(radice->destro);
-				radice->sinistro = NULL;
-				radice->destro = NULL;
-				return radice;
-			}
-		}
+                if (calcolo_valido) {
+                    radice->tipo = NODO_NUMERO;
+                    radice->valore_numero = risultato;
+                    libera_albero(radice->sinistro);
+                    libera_albero(radice->destro);
+                    radice->sinistro = NULL;
+                    radice->destro = NULL;
+                    return radice;
+                }
+            }
+            
+            else if (radice->sinistro->tipo == NODO_MATRICE && radice->destro->tipo == NODO_MATRICE) {
+                Matrix* sx = radice->sinistro->value_matrix;
+                Matrix* dx = radice->destro->value_matrix;
+                Matrix* risultato = NULL;
 
-		if (radice->operatore == '*') {
-			if ((radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) ||
-					(radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero))) {
-				return crea_nodo_numero(complex_create(0.0, 0.0));
-			}
-			if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_one(radice->sinistro->valore_numero)) {
-				return radice->destro;
-			}
-			if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_one(radice->destro->valore_numero)) {
-				return radice->sinistro;
-			}
-		}
-		if (radice->operatore == '+') {
-			if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) {
-				return radice->destro;
-			}
-			if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero)) {
-				return radice->sinistro;
-			}
-		}
-		if (radice->operatore == '/') {
-			if (alberi_uguali(radice->sinistro, radice->destro)) {
-				return crea_nodo_numero(complex_create(1.0, 0.0));
-			}
-		}
-		if (radice->operatore == '^') {
-			if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_one(radice->destro->valore_numero)) {
-				return radice->sinistro;
-			}
-			if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero)) {
-				return crea_nodo_numero(complex_create(1.0, 0.0));
-			}
-			if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) {
-				return crea_nodo_numero(complex_create(0.0, 0.0));
-			}
-			if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_one(radice->sinistro->valore_numero)) {
-				return crea_nodo_numero(complex_create(1.0, 0.0));
-			}
-		}
-		if (radice->operatore == '-') {
-			if (alberi_uguali(radice->sinistro, radice->destro)) {
-				return crea_nodo_numero(complex_create(0.0, 0.0));
-			}
-			if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero)) {
-				return radice->sinistro;
-			}
-			if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) {
-				NodoAST* meno_uno = crea_nodo_numero(complex_create(-1.0, 0.0));
-				return crea_nodo_operatore('*', meno_uno, radice->destro);
-			}
-		}
-	}
-	return radice;
+                if (radice->operatore == '+') risultato = matrix_add(sx, dx);
+                else if (radice->operatore == '-') risultato = matrix_sub(sx, dx);
+                else if (radice->operatore == '*') risultato = matrix_mul(sx, dx);
+
+                if (risultato != NULL) {
+                    radice->tipo = NODO_MATRICE;
+                    radice->value_matrix = risultato;
+                    libera_albero(radice->sinistro);
+                    libera_albero(radice->destro);
+                    radice->sinistro = NULL;
+                    radice->destro = NULL;
+                    return radice;
+                }
+            }
+
+            else if (radice->operatore == '*') {
+                Matrix* m = NULL;
+                Complex scalare;
+                int valido = 0;
+
+                if (radice->sinistro->tipo == NODO_MATRICE && radice->destro->tipo == NODO_NUMERO) {
+                    m = radice->sinistro->value_matrix;
+                    scalare = radice->destro->valore_numero;
+                    valido = 1;
+                } else if (radice->sinistro->tipo == NODO_NUMERO && radice->destro->tipo == NODO_MATRICE) {
+                    m = radice->destro->value_matrix;
+                    scalare = radice->sinistro->valore_numero;
+                    valido = 1;
+                }
+
+                if (valido && m != NULL) {
+                    Matrix* risultato = matrix_scalar_mul(m, scalare);
+                    radice->tipo = NODO_MATRICE;
+                    radice->value_matrix = risultato;
+                    libera_albero(radice->sinistro);
+                    libera_albero(radice->destro);
+                    radice->sinistro = NULL;
+                    radice->destro = NULL;
+                    return radice;
+                }
+            }
+        }
+
+        if (radice->operatore == '*') {
+            if ((radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) ||
+                (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero))) {
+                return crea_nodo_numero(complex_create(0.0, 0.0));
+            }
+            if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_one(radice->sinistro->valore_numero)) {
+                return radice->destro;
+            }
+            if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_one(radice->destro->valore_numero)) {
+                return radice->sinistro;
+            }
+        }
+        if (radice->operatore == '+') {
+            if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) {
+                return radice->destro;
+            }
+            if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero)) {
+                return radice->sinistro;
+            }
+        }
+        if (radice->operatore == '/') {
+            if (alberi_uguali(radice->sinistro, radice->destro)) {
+                return crea_nodo_numero(complex_create(1.0, 0.0));
+            }
+        }
+        if (radice->operatore == '^') {
+            if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_one(radice->destro->valore_numero)) {
+                return radice->sinistro;
+            }
+            if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero)) {
+                return crea_nodo_numero(complex_create(1.0, 0.0));
+            }
+            if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) {
+                return crea_nodo_numero(complex_create(0.0, 0.0));
+            }
+            if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_one(radice->sinistro->valore_numero)) {
+                return crea_nodo_numero(complex_create(1.0, 0.0));
+            }
+        }
+        if (radice->operatore == '-') {
+            if (alberi_uguali(radice->sinistro, radice->destro)) {
+                return crea_nodo_numero(complex_create(0.0, 0.0));
+            }
+            if (radice->destro && radice->destro->tipo == NODO_NUMERO && complex_is_zero(radice->destro->valore_numero)) {
+                return radice->sinistro;
+            }
+            if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO && complex_is_zero(radice->sinistro->valore_numero)) {
+                NodoAST* meno_uno = crea_nodo_numero(complex_create(-1.0, 0.0));
+                return crea_nodo_operatore('*', meno_uno, radice->destro);
+            }
+        }
+    }
+    if (radice->tipo == NODO_FUNZIONE) {
+            if (radice->sinistro && radice->sinistro->tipo == NODO_NUMERO) {
+                Complex arg = radice->sinistro->valore_numero;
+                Complex risultato = complex_create(0.0, 0.0);
+                int calcolo_valido = 1;
+
+                if (strcmp(radice->nome, "sin") == 0) risultato = complex_sin(arg);
+                else if (strcmp(radice->nome, "cos") == 0) risultato = complex_cos(arg);
+                else if (strcmp(radice->nome, "tan") == 0) risultato = complex_tan(arg);
+                else if (strcmp(radice->nome, "exp") == 0) risultato = complex_exp(arg);
+                else if (strcmp(radice->nome, "sqrt") == 0) risultato = complex_sqrt(arg);
+                else if (strcmp(radice->nome, "log") == 0) {
+                    if (complex_is_zero(arg)) {
+                        printf("[WARNING] Invalid domain: logarithm of zero!\n");
+                        calcolo_valido = 0;
+                    } else {
+                        risultato = complex_log(arg);
+                    }
+                } else calcolo_valido = 0;
+
+                if (calcolo_valido) {
+                    radice->tipo = NODO_NUMERO;
+                    radice->valore_numero = risultato;
+                    libera_albero(radice->sinistro);
+                    radice->sinistro = NULL;
+                    return radice;
+                }
+            }
+        }
+    return radice;
 }
 
 NodoAST* riordina_albero(NodoAST* radice) {
@@ -329,6 +409,30 @@ NodoAST* riordina_albero(NodoAST* radice) {
 		}
 	}
 	return radice;
+}
+
+void inietta_valori_in_place(NodoAST* radice, TabellaSimboli* tabella) {
+    if (radice == NULL) return;
+    
+    if (radice->tipo == NODO_VARIABILE) {
+        for (int i = 0; i < tabella->conteggio; i++) {
+            if (strcmp(tabella->array[i].nome, radice->nome) == 0) {
+                radice->tipo = NODO_NUMERO;
+                radice->valore_numero = tabella->array[i].valore;
+                break;
+            }
+        }
+    }
+    
+    inietta_valori_in_place(radice->sinistro, tabella);
+    inietta_valori_in_place(radice->destro, tabella);
+}
+
+NodoAST* valuta_simbolicamente(NodoAST* radice, TabellaSimboli* tabella) {
+    if (radice == NULL) return NULL;
+    NodoAST* clone = copia_albero(radice);
+    inietta_valori_in_place(clone, tabella);
+    return semplifica(clone);
 }
 
 Complex valuta_albero(NodoAST* radice, TabellaSimboli* tabella) {

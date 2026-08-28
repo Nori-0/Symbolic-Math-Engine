@@ -40,11 +40,29 @@ NodoAST* crea_nodo_funzione(const char* nome, NodoAST* argomento) {
     return nodo;
 }
 
+NodoAST* crea_nodo_matrice(Matrix* matrix) {
+	NodoAST* nodo = (NodoAST*)malloc(sizeof(NodoAST));
+	nodo->tipo = NODO_MATRICE;
+	nodo->value_matrix = matrix;
+	nodo->sinistro = NULL;
+	nodo->destro = NULL;
+	return nodo;
+}
+
 NodoAST* copia_albero(NodoAST* radice) {
 	if (radice == NULL) return NULL;
 
 	NodoAST* nuovo = (NodoAST*)malloc(sizeof(NodoAST));
 	*nuovo = *radice;
+
+	if (radice->tipo == NODO_MATRICE && radice->value_matrix != NULL) {
+		Matrix* orig = radice->value_matrix;
+		Matrix* copia = matrix_create(orig->rows, orig->cols);
+		for(int i = 0; i < orig->rows * orig->cols; i++) {
+			copia->data[i] = orig->data[i];
+		}
+		nuovo->value_matrix = copia;
+	}
 
 	nuovo->sinistro = copia_albero(radice->sinistro);
 	nuovo->destro = copia_albero(radice->destro);
@@ -56,6 +74,9 @@ void libera_albero(NodoAST* radice) {
 	if (radice == NULL) return;
 	libera_albero(radice->sinistro);
 	libera_albero(radice->destro);
+	if (radice->tipo == NODO_MATRICE) {
+		matrix_free(radice->value_matrix);
+	}
 	free(radice);
 }
 
@@ -88,6 +109,10 @@ void stampa_albero_ricorsiva(NodoAST* radice, int livello, int is_left, int* ram
     else if (radice->tipo == NODO_OPERATORE) printf("[%c]\n", radice->operatore);
     else if (radice->tipo == NODO_VARIABILE) printf("[%s]\n", radice->nome);
     else if (radice->tipo == NODO_FUNZIONE) printf("[%s]\n", radice->nome);
+    else if (radice->tipo == NODO_MATRICE){
+		matrix_print(radice->value_matrix);
+		printf("\n");
+	}
 
     if (radice->sinistro && radice->destro) {
         stampa_albero_ricorsiva(radice->sinistro, livello + 1, 1, rami);
@@ -122,6 +147,9 @@ void stampa_equazione_ricorsiva(NodoAST* radice, int prec_padre) {
         stampa_equazione_ricorsiva(radice->sinistro, 0); 
         printf(")");
     } 
+    else if (radice->tipo == NODO_MATRICE) {
+	    matrix_print(radice->value_matrix);
+    }
     else if (radice->tipo == NODO_OPERATORE) {
         int prec_corrente = 0;
         if (radice->operatore == '+' || radice->operatore == '-') prec_corrente = 1;

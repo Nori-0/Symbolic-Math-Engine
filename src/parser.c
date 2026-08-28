@@ -70,7 +70,10 @@ NodoAST* costruisci_albero() {
         //dritto nella pila dei nodi
         if (t.tipo == TOKEN_NUMERO) {
             push_nodo(crea_nodo_numero(t.valore));
-        } 
+        }
+	else if (t.tipo == TOKEN_MATRICE) {
+		push_nodo(crea_nodo_matrice(t.valore_matrice));
+	}
         else if (t.tipo == TOKEN_VARIABILE) {
             push_nodo(crea_nodo_variabile(t.nome));
         }

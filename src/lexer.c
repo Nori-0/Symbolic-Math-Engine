@@ -75,6 +75,55 @@ int estrai_testo(const char* input, int indice, Token* token) {
 	return indice;
 }
 
+int estrai_matrice(const char* input, int indice, Token* token) {
+    indice++;
+    
+    int righe = 1;
+    int colonne = 1;
+    int temp_indice = indice;
+    
+    while (input[temp_indice] != ']' && input[temp_indice] != '\0') {
+        if (input[temp_indice] == ';') righe++;
+     	if (righe == 1 && input[temp_indice] == ',') colonne++;
+        temp_indice++;
+    }
+    
+    Matrix* m = matrix_create(righe, colonne);
+    
+    int r = 0, c = 0;
+    char buffer[64];
+    int b_idx = 0;
+    
+    while (input[indice] != ']' && input[indice] != '\0') {
+        char ch = input[indice];
+        
+        if (isdigit(ch) || ch == '.' || ch == '-' || ch == '+') {
+            buffer[b_idx++] = ch;
+        } 
+        
+        if (ch == ',' || ch == ';' || input[indice+1] == ']') {
+            if (b_idx > 0) {
+                buffer[b_idx] = '\0';
+                matrix_set(m, r, c, complex_create(strtod(buffer, NULL), 0.0));
+                b_idx = 0;
+                c++;
+            }
+            if (ch == ';') {
+                r++; 
+                c = 0;
+            }
+        }
+        indice++;
+    }
+    
+    if (input[indice] == ']') indice++; 
+    
+    token->tipo = TOKEN_MATRICE;
+    token->valore_matrice = m;
+    
+    return indice;
+}
+
 void tokenizza(const char* input) {
 	int i = 0;
 	numero_token_estratti = 0;
@@ -91,6 +140,12 @@ void tokenizza(const char* input) {
 		}
 		if (isalpha(input[i])) {
 			i = estrai_testo(input, i, &lista_token[numero_token_estratti]);
+			numero_token_estratti++;
+			continue;
+		}
+
+		if (input[i] == '[') {
+			i = estrai_matrice(input, i, &lista_token[numero_token_estratti]);
 			numero_token_estratti++;
 			continue;
 		}
@@ -123,7 +178,6 @@ void tokenizza(const char* input) {
     	}
 }
 
-//vedo cosa ha capito il lexer
 void stampa_token() {
     printf("\n--- TOKEN ESTRATTI ---\n");
     for (int i = 0; i < numero_token_estratti; i++) {
@@ -142,6 +196,10 @@ void stampa_token() {
             case TOKEN_POTENZA:      printf("OPERATORE: ^\n"); break;
             case TOKEN_PAREN_APERTA: printf("PARENTESI: (\n"); break;
             case TOKEN_PAREN_CHIUSA: printf("PARENTESI: )\n"); break;
+	    case TOKEN_MATRICE:      printf("MATRICE: "); 
+				     matrix_print(t.valore_matrice);
+				     printf("\n");
+				     break;
             default:                 printf("SCONOSCIUTO\n"); break;
         }
     }

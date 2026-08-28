@@ -11,6 +11,7 @@
 #include "solver.h"
 #include "taylor.h"
 #include "complex_math.h"
+#include "matrix_math.h"
 
 int main() {
     char input[MAX_INPUT_SIZE];
@@ -40,23 +41,25 @@ int main() {
         tabella.conteggio++;
 
         trova_variabili(radice, &tabella);
-
+	
+	int num_variabili_utente = 0;
         printf("\nVariables found in the expression: ");
         for(int i=0; i < tabella.conteggio; i++) {
-            if (strcmp(tabella.array[i].nome, "pi") != 0 && strcmp(tabella.array[i].nome, "e") != 0)
+            if (strcmp(tabella.array[i].nome, "pi") != 0 && strcmp(tabella.array[i].nome, "e") != 0){
                 printf("[%s] ", tabella.array[i].nome);
+		num_variabili_utente++;
+	    }
         }
-        printf("\n");
 
         char var_bersaglio[10] = "x";
 
-	int num_variabili_utente = 0;
-        for (int i = 0; i < tabella.conteggio; i++) {
-		if (strcmp(tabella.array[i].nome, "pi") != 0 && strcmp(tabella.array[i].nome, "e") != 0) {
-			num_variabili_utente++;
-		}
-	}
-	if (num_variabili_utente > 0) {
+	if (num_variabili_utente == 0) {
+		printf("\n[SYSTEM] No unknown variables found. Using 'x' as the default.\n");
+		strcpy(tabella.array[tabella.conteggio].nome, "x");
+            tabella.array[tabella.conteggio].valore = complex_create(0.0, 0.0);
+            tabella.conteggio++;
+        } else {
+		printf("\n");
 		int variabile_valida = 0;
 		while (!variabile_valida) {
 			printf("Target variable for calculus: ");
@@ -64,8 +67,7 @@ int main() {
 				var_bersaglio[strcspn(var_bersaglio, "\n")] = 0;
 			}
 			for (int i = 0; i < tabella.conteggio; i++) {
-				if (strcmp(tabella.array[i].nome, var_bersaglio) == 0 &&
-						strcmp(var_bersaglio, "pi") != 0 && strcmp(var_bersaglio, "e") != 0) {
+				if (strcmp(tabella.array[i].nome, var_bersaglio) == 0 && strcmp(var_bersaglio, "pi") != 0 && strcmp(var_bersaglio, "e") != 0) {
 					variabile_valida = 1;
 					break;
 				}
@@ -74,11 +76,6 @@ int main() {
 				printf("[ERROR] '%s' is not a valid variable. Please try again.\n", var_bersaglio);
 			}
 		}
-	} else {
-		printf("\n[SYSTEM] No unknown variables found. Using 'x' as the default.\n");
-		strcpy(tabella.array[tabella.conteggio].nome, "x");
-		tabella.array[tabella.conteggio].valore = complex_create(0.0, 0.0);
-		tabella.conteggio++;
 	}
 
         NodoAST* radice_d = deriva(radice, var_bersaglio);
@@ -111,17 +108,20 @@ int main() {
                 tabella.array[i].valore = complex_create(strtod(buffer_valore, NULL), 0.0);
             }
         }
-        
-        Complex risultato = valuta_albero(radice, &tabella);
-        Complex risultato_d = valuta_albero(radice_d, &tabella);
+        NodoAST* risultato_nodo = valuta_simbolicamente(radice, &tabella);
+	NodoAST* risultato_d_nodo = valuta_simbolicamente(radice_d, &tabella);
 
         printf("\n[RESULTS]\n");
         printf("Function value: f = ");
-	complex_printf(risultato);
+	stampa_equazione(risultato_nodo);
 	printf("\n");
+
         printf("Partial derivative at that point: f' = ");
-	complex_printf(risultato_d);
+	stampa_equazione(risultato_d_nodo);
 	printf("\n");
+
+	libera_albero(risultato_nodo);
+	libera_albero(risultato_d_nodo);
 
 	printf("\n--- AREA CALCULATION (DEFINITE INTEGRAL) ---\n");
         char risposta[10];

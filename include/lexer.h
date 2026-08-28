@@ -5,6 +5,8 @@
 #define MAX_TOKENS 100
 
 #include "complex_math.h"
+#include "matrix_math.h"
+
 
 typedef enum {
     TOKEN_NUMERO,
@@ -18,6 +20,7 @@ typedef enum {
     TOKEN_PAREN_CHIUSA,
     TOKEN_FUNZIONE,
     TOKEN_MENO_UNARIO,
+    TOKEN_MATRICE,
     TOKEN_FINE
 } TipoToken;
 
@@ -25,6 +28,7 @@ typedef struct {
     TipoToken tipo;
     Complex valore;
     char nome[10];
+    Matrix* valore_matrice;
 } Token;
 
 

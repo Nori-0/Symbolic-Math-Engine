@@ -2,12 +2,14 @@
 #define AST_H
 
 #include "complex_math.h"
+#include "matrix_math.h"
 
 typedef enum {
 	NODO_NUMERO,
 	NODO_VARIABILE,
 	NODO_OPERATORE,
-	NODO_FUNZIONE
+	NODO_FUNZIONE,
+	NODO_MATRICE
 } TipoNodo;
 
 typedef struct NodoAST {
@@ -15,13 +17,15 @@ typedef struct NodoAST {
     union {
 	Complex valore_numero;
         char operatore;
-        char nome[10]; 
+        char nome[10];
+	Matrix* value_matrix;
     };
     struct NodoAST* sinistro;
     struct NodoAST* destro;
 } NodoAST;
 
 NodoAST* crea_nodo_numero(Complex valore);
+NodoAST* crea_nodo_matrice(Matrix* matrix);
 NodoAST* crea_nodo_operatore(char op, NodoAST* sx, NodoAST* dx);
 NodoAST* crea_nodo_variabile(const char* nome);
 NodoAST* crea_nodo_funzione(const char* nome, NodoAST* argomento);
